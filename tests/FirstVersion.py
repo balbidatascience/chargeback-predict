@@ -8,7 +8,7 @@ import pandas as pd
 
 #df = read_csv('datasets/cbk_analysis_v1.csv', sep=';', encoding='latin_1')
 
-df = read_csv('datasets/DemoConciliacaoVendasIR2018.csv', sep=';', encoding='latin_1')
+df = read_csv('../datasets/DemoConciliacaoVendasIR2018.csv', sep=';', encoding='latin_1')
 df['data_compra'] = to_datetime(df['data_compra']).map(lambda x: x.date())
 #df['data_compra'] = df['data_compra'].map(lambda x: x.date())
 
