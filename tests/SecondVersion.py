@@ -15,16 +15,16 @@ df_hist = df[['data_compra', 'Conciliado', 'VlrCompra']].groupby(['data_compra',
 df_hist.reset_index(level=['data_compra', 'Conciliado'], inplace=True)
 
 
-def generate_bar(df):
+def generate_barSales(df):
     pv = pd.pivot_table(df, index=['data_compra'], columns=["Conciliado"], values=['VlrCompra'], aggfunc=sum,
                         fill_value=0)
 
-    trace1 = go.Bar(x=pv.index, y=pv[('VlrCompra', 'Conciliada')], name='Conciliada', marker={'color': '#16AFA6'})
+    trace1 = go.Bar(x=pv.index, y=pv[('VlrCompra', 'Conciliada')], name='Conciliada', marker={'color': '#678CDF'})
     trace2 = go.Bar(x=pv.index, y=pv[('VlrCompra', 'Divergente')], name='Divergente', marker={'color': '#C34C83'})
     trace3 = go.Bar(x=pv.index, y=pv[('VlrCompra', 'Em aberto')], name='Em aberto', marker={'color': '#5F3352'})
 
     return dcc.Graph(
-        id='example-graph',
+        id='graph-bar-sales',
         figure={
             'data': [trace1, trace2, trace3],
             'layout':
@@ -49,6 +49,50 @@ def generate_bar(df):
                                     'stepmode': 'backward',
                                     'count': '7',
                                     'label':  '#semana'
+                                }
+                            ],
+                            'font': {'family': '\"Open Sans\", verdana, arial, sans-serif',
+                                     "size": '12',
+                                     'color': '#444'
+                                     }
+                        }
+                    })
+        })
+
+def generate_barPayments(df):
+    pv = pd.pivot_table(df, index=['data_compra'], columns=["Situacao"], values=['VlrCompra'], aggfunc=sum,
+                        fill_value=0)
+
+    trace1 = go.Bar(x=pv.index, y=pv[('VlrCompra', 'Liquidada')], name='Liquidada', marker={'color': '#16AFA6'})
+    trace2 = go.Bar(x=pv.index, y=pv[('VlrCompra', 'Acatada')], name='Acatada', marker={'color': '#EDD267'})
+    trace3 = go.Bar(x=pv.index, y=pv[('VlrCompra', 'Em aberto')], name='Em aberto', marker={'color': '#5F3352'})
+
+    return dcc.Graph(
+        id='graph-bar-payments',
+        figure={
+            'data': [trace1, trace2, trace3],
+            'layout':
+                go.Layout(
+                    title='Status dos Recebíveis',
+                    barmode='stack',
+                    xaxis={
+                        'rangeselector': {
+                            'buttons': [
+                                {
+                                    'step': 'all',
+                                    'label': '#reset'
+                                },
+                                {
+                                    'step': 'month',
+                                    'label': '#mês',
+                                    'stepmode': 'backward',
+                                    'count': '1'
+                                },
+                                {
+                                    'step': 'day',
+                                    'stepmode': 'backward',
+                                    'count': '7',
+                                    'label': '#semana'
                                 }
                             ],
                             'font': {'family': '\"Open Sans\", verdana, arial, sans-serif',
@@ -92,13 +136,14 @@ def generate_slider(df):
 
 app.layout = html.Div(children=[
     html.H1(
-        children='Conciliação de Vendas',
+        children='Monitor Conciliação de Vendas',
         style={
             'textAlign': 'center'
         }
     ),
     html.Div(children='Última atualização: ' + datetime.strftime(datetime.now(), "%d/%m/%Y %H:%M:%S")),
-    generate_bar(df),
+    generate_barSales(df),
+    generate_barPayments(df),
     dcc.Graph(
         id='graph1',
         figure={
