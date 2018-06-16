@@ -30,7 +30,11 @@ def generate_barSales(df):
             'layout':
                 go.Layout(
                     title='Status das Vendas',
+                    titlefont={'size': 20},
                     barmode='stack',
+                    legend={
+                        'font': {'size': 14}
+                    },
                     xaxis={
                         'rangeselector': {
                             'buttons': [
@@ -48,7 +52,7 @@ def generate_barSales(df):
                                     'step': 'day',
                                     'stepmode': 'backward',
                                     'count': '7',
-                                    'label':  '#semana'
+                                    'label': '#semana'
                                 }
                             ],
                             'font': {'family': '\"Open Sans\", verdana, arial, sans-serif',
@@ -58,6 +62,7 @@ def generate_barSales(df):
                         }
                     })
         })
+
 
 def generate_barPayments(df):
     pv = pd.pivot_table(df, index=['data_compra'], columns=["Situacao"], values=['VlrCompra'], aggfunc=sum,
@@ -74,7 +79,11 @@ def generate_barPayments(df):
             'layout':
                 go.Layout(
                     title='Status dos Recebíveis',
+                    titlefont={'size': 20},
                     barmode='stack',
+                    legend={
+                        'font': {'size': 14}
+                    },
                     xaxis={
                         'rangeselector': {
                             'buttons': [
@@ -134,41 +143,84 @@ def generate_slider(df):
     )
 
 
-app.layout = html.Div(className='container-fluid',
+app.layout = html.Div(
+
+    [html.Div(className='container-fluid',
+              children=[
+                  html.H1(
+                      children='Monitor Conciliação de Vendas',
+                      style={
+                          'textAlign': 'center'
+                      }
+                  )#,
+                  #html.Div(children='Última atualização: ' + datetime.strftime(datetime.now(), "%d/%m/%Y %H:%M:%S"))
+                  ]),
+
+     html.Div(className='row justify-content-start',
+              children=[
+                  html.Div(
+                      className='col-2',
                       children=[
-                        html.H1(
-                            children='Monitor Conciliação de Vendas',
-                            style={
-                                'textAlign': 'center'
-                            }
-                        ),
-                        html.Div(children='Última atualização: ' + datetime.strftime(datetime.now(), "%d/%m/%Y %H:%M:%S")),
-                        generate_barSales(df),
-                        generate_barPayments(df),
-                        dcc.Graph(
-                            id='graph1',
-                            figure={
-                                'data': [
-                                    {'x': df_hist.index, 'y': df_hist['VlrCompra'],
-                                     'type': 'bar',
-                                     'name': 'Vendas'
-                                     },
-                                    {'x': df_hist.index, 'y': df_hist['VlrCompra'], 'type': 'bar',
-                                     'name': 'CBK'}
-                                ],
-                                'layout': {
-                                    'title': 'Evolução do Chargeback',
-                                    'barmode': 'relative'
-                                }
-                            }
-                        ),
-                        generate_slider(df_hist),
-                        generate_table(df)  # ,
-                        # dcc.Graph(id='graph-with-slider'),
-                      ])
+                          html.Div(
+                              className='card mb-5 box-shadow text-center',
+                              children=[
+                                  html.Div(className='card-header', children=[html.H6('Índice de Conciliação')]),
+                                  html.Div(className='card-body', children=[html.H4('37%')])
+                              ]
+                          ),
+                          html.Div(
+                              className='card mb-5 box-shadow text-center',
+                              children=[
+                                  html.Div(className='card-header', children=[html.H6('Recebido no mês')]),
+                                  html.Div(className='card-body', children=[html.H4('R$ 790K')])
+                              ]
+                          ),
+                          html.Div(
+                              className='card mb-5 box-shadow text-center',
+                              children=[
+                                  html.Div(className='card-header', children=[html.H6('A receber no mês')]),
+                                  html.Div(className='card-body', children=[html.H4('R$ 1.2M')])
+                              ]
+                          )
+                      ],
+                      style={'margin-top': '150px'}),
+                  html.Div(
+                      className='col-10',
+                      children=[generate_barSales(df),generate_barPayments(df)]),
+                  dcc.Graph(
+                      id='graph1',
+                      figure={
+                          'data': [
+                              {'x': df_hist.index, 'y': df_hist['VlrCompra'],
+                               'type': 'bar',
+                               'name': 'Vendas'
+                               },
+                              {'x': df_hist.index, 'y': df_hist['VlrCompra'], 'type': 'bar',
+                               'name': 'CBK'}
+                          ],
+                          'layout': {
+                              'title': 'Evolução do Chargeback',
+                              'barmode': 'relative'
+                          }
+                      }
+                  )],
+              style={'margin-left': '10', 'margin-right': '10'}),
+
+     html.Div(className='row',
+              children=[
+                  html.Div(className='col-2', children=[html.H4('Teste')]),
+                  html.Div(className='col-6',
+                           children=[
+                               generate_slider(df_hist),
+                               generate_table(df)
+                           ])  # ,
+                  # dcc.Graph(id='graph-with-slider'),
+              ])]
+
+)
 
 app.css.append_css({"external_url": "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"})
-
+#app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"})
 
 # Run application
 if __name__ == '__main__':
